@@ -1,5 +1,6 @@
 package com.example.myapplication.composables
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,12 +33,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.myapplication.R
+import com.example.myapplication.ui.OnboardingViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.Home
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Onboarding() {
+fun Onboarding(navController: NavHostController, onboardingViewModel: OnboardingViewModel) {
+    val context = LocalContext.current
     var firstName by remember {
         mutableStateOf(TextFieldValue(""))
     }
@@ -118,8 +124,27 @@ fun Onboarding() {
             )
         }
         Button(
-            onClick = { /*TODO*/ },
-            border = BorderStroke(0.5.dp,Color.Red),
+            onClick = {
+                if (firstName.text.isBlank() or
+                    lastName.text.isBlank() or
+                    email.text.isBlank()
+                ) {
+                    Toast.makeText(
+                        context,
+                        "Registration unsuccessful. Please enter all data.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Registration successful!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    onboardingViewModel.saveLoginData(firstName.text,lastName.text,email.text)
+                    navController.navigate(Home.route)
+                }
+            },
+            border = BorderStroke(0.5.dp, Color.Red),
             shape = RoundedCornerShape(25),
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,6 +162,6 @@ fun Onboarding() {
 @Composable
 fun OnboardingPreview() {
     MyApplicationTheme {
-        Onboarding()
+//        Onboarding()
     }
 }
