@@ -1,4 +1,4 @@
-package com.example.myapplication.composables
+package com.example.littlelemon.ui.profile
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -21,10 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.myapplication.Onboarding
-import com.example.myapplication.R
-import com.example.myapplication.ui.OnboardingViewModel
-import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.littlelemon.Onboarding
+import com.example.littlelemon.R
+import com.example.littlelemon.ui.onboarding.OnboardingViewModel
+import com.example.littlelemon.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
