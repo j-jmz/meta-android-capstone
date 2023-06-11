@@ -16,10 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,29 +25,24 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.littlelemon.Home
 import com.example.littlelemon.R
+import com.example.littlelemon.ui.UserData
 import com.example.littlelemon.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Onboarding(navController: NavHostController, onboardingViewModel: OnboardingViewModel) {
+fun Onboarding(navController: NavHostController,
+               viewModel: OnboardingViewModel = hiltViewModel()) {
     val context = LocalContext.current
-    var firstName by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var lastName by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var email by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
+    val state = viewModel.state.collectAsState(initial = UserData())
+
     Column {
         Column(
             modifier = Modifier.weight(1f)
@@ -89,8 +81,8 @@ fun Onboarding(navController: NavHostController, onboardingViewModel: Onboarding
                     .align(Alignment.Start)
             )
             OutlinedTextField(
-                value = firstName,
-                onValueChange = { firstName = it },
+                value = state.value.firstName,
+                onValueChange = { viewModel.onEvent(OnboardingEvent.OnFirstNameChanged(it)) },
                 label = { Text("First name") },
                 placeholder = { Text(text = "First name") },
                 shape = RoundedCornerShape(25),
@@ -100,8 +92,8 @@ fun Onboarding(navController: NavHostController, onboardingViewModel: Onboarding
                     .align(Alignment.CenterHorizontally)
             )
             OutlinedTextField(
-                value = lastName,
-                onValueChange = { lastName = it },
+                value = state.value.lastName,
+                onValueChange = { viewModel.onEvent(OnboardingEvent.OnLastNameChanged(it)) },
                 label = { Text("Last name") },
                 placeholder = { Text(text = "Last name") },
                 shape = RoundedCornerShape(25),
@@ -111,8 +103,8 @@ fun Onboarding(navController: NavHostController, onboardingViewModel: Onboarding
                     .align(Alignment.CenterHorizontally)
             )
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = state.value.email,
+                onValueChange = { viewModel.onEvent(OnboardingEvent.OnEmailChanged(it)) },
                 label = { Text("E-mail") },
                 placeholder = { Text(text = "E-mail") },
                 shape = RoundedCornerShape(25),
@@ -124,10 +116,7 @@ fun Onboarding(navController: NavHostController, onboardingViewModel: Onboarding
         }
         Button(
             onClick = {
-                if (firstName.text.isBlank() or
-                    lastName.text.isBlank() or
-                    email.text.isBlank()
-                ) {
+                if (!viewModel.isInputDataValid() ) {
                     Toast.makeText(
                         context,
                         "Registration unsuccessful. Please enter all data.",
@@ -139,7 +128,7 @@ fun Onboarding(navController: NavHostController, onboardingViewModel: Onboarding
                         "Registration successful!",
                         Toast.LENGTH_LONG
                     ).show()
-                    onboardingViewModel.saveLoginData(firstName.text,lastName.text,email.text)
+                    viewModel.onEvent(OnboardingEvent.OnSaveUserData)
                     navController.navigate(Home.route)
                 }
             },

@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,12 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.littlelemon.Onboarding
 import com.example.littlelemon.R
-import com.example.littlelemon.ui.onboarding.OnboardingViewModel
+import com.example.littlelemon.ui.UserData
 import com.example.littlelemon.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(navController: NavHostController, onboardingViewModel: OnboardingViewModel) {
+fun Profile(
+    navController: NavHostController,
+    viewModel: ProfileViewModel
+) {
+    val state = viewModel.sate.collectAsState(initial = UserData())
 
     Column() {
         Column(modifier = Modifier.weight(1f)) {
@@ -49,7 +54,7 @@ fun Profile(navController: NavHostController, onboardingViewModel: OnboardingVie
                     .padding(start = 10.dp, top = 60.dp, bottom = 60.dp)
             )
             OutlinedTextField(
-                value = onboardingViewModel.getUserData().firstName,
+                value = state.value.firstName,
                 onValueChange = {},
                 label = { Text(text = "First Name") },
                 shape = RoundedCornerShape(25.dp),
@@ -58,7 +63,7 @@ fun Profile(navController: NavHostController, onboardingViewModel: OnboardingVie
                     .padding(start = 10.dp, end = 10.dp, top = 40.dp, bottom = 15.dp)
             )
             OutlinedTextField(
-                value = onboardingViewModel.getUserData().lastName,
+                value = state.value.lastName,
                 onValueChange = {},
                 label = { Text(text = "Last Name") },
                 shape = RoundedCornerShape(25.dp),
@@ -67,7 +72,7 @@ fun Profile(navController: NavHostController, onboardingViewModel: OnboardingVie
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 15.dp)
             )
             OutlinedTextField(
-                value = onboardingViewModel.getUserData().email,
+                value = state.value.email,
                 onValueChange = {},
                 label = { Text(text = "Email") },
                 shape = RoundedCornerShape(25.dp),
@@ -78,7 +83,7 @@ fun Profile(navController: NavHostController, onboardingViewModel: OnboardingVie
         }
         Button(
             onClick = {
-                onboardingViewModel.deleteUserData()
+                viewModel.onEvent(ProfileEvents.deleteUserData)
                 navController.navigate(Onboarding.route)
             },
             border = BorderStroke(0.5.dp, Color.Red),

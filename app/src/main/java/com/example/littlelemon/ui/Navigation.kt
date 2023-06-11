@@ -13,9 +13,13 @@ import com.example.littlelemon.ui.home.Home
 import com.example.littlelemon.ui.onboarding.Onboarding
 import com.example.littlelemon.ui.onboarding.OnboardingViewModel
 import com.example.littlelemon.ui.profile.Profile
+import com.example.littlelemon.ui.profile.ProfileViewModel
 
 @Composable
-fun Navigation(onboardingViewModel: OnboardingViewModel = hiltViewModel()) {
+fun Navigation(
+    onboardingViewModel: OnboardingViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel()
+) {
     val navController: NavHostController = rememberNavController()
     NavHost(
         navController = navController,
@@ -32,7 +36,7 @@ fun Navigation(onboardingViewModel: OnboardingViewModel = hiltViewModel()) {
             Home(navController)
         }
         composable(Profile.route) {
-            Profile(navController, onboardingViewModel)
+            Profile(navController, profileViewModel)
         }
     }
 }

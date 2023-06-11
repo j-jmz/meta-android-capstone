@@ -2,7 +2,10 @@ package com.example.littlelemon.ui.onboarding
 
 import androidx.lifecycle.ViewModel
 import com.example.littlelemon.domain.repository.SharedPrefsRepository
+import com.example.littlelemon.ui.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -10,20 +13,36 @@ class OnboardingViewModel @Inject constructor(
     private val prefsRepo: SharedPrefsRepository
 ) : ViewModel() {
 
-    data class UserData(
-        val firstName: String,
-        val lastName: String,
-        val email: String,
-    )
+    private val _state = MutableStateFlow(UserData())
+    val state: Flow<UserData> = _state
 
-    fun saveLoginData(
-        firstName: String,
-        lastName: String,
-        email: String
+    fun onEvent(event: OnboardingEvent) {
+        when (event) {
+            is OnboardingEvent.OnFirstNameChanged -> {
+                _state.value = _state.value.copy(firstName = event.firstName)
+            }
+            is OnboardingEvent.OnLastNameChanged -> {
+                _state.value = _state.value.copy(lastName = event.lastName)
+            }
+            is OnboardingEvent.OnEmailChanged -> {
+                _state.value = _state.value.copy(email = event.email)
+            }
+            is OnboardingEvent.OnSaveUserData -> {
+                saveLoginData(_state.value)
+            }
+        }
+    }
+
+    fun isInputDataValid(): Boolean {
+       return _state.value.firstName.isNotBlank()
+    }
+
+    private fun saveLoginData(
+        data: UserData
     ) {
-        prefsRepo.putString("firstName", firstName)
-        prefsRepo.putString("lastName", lastName)
-        prefsRepo.putString("email", email)
+        prefsRepo.putString("firstName", data.firstName)
+        prefsRepo.putString("lastName", data.lastName)
+        prefsRepo.putString("email", data.email)
     }
 
     fun isUserLoggedIn(): Boolean {
@@ -32,13 +51,4 @@ class OnboardingViewModel @Inject constructor(
                 prefsRepo.contains("email")
     }
 
-    fun deleteUserData() = prefsRepo.deleteData()
-
-    fun getUserData(): UserData {
-        return UserData(
-            prefsRepo.getString("firstName", ""),
-            prefsRepo.getString("lastName", ""),
-            prefsRepo.getString("email", ""),
-        )
-    }
 }
